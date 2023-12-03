@@ -2,10 +2,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Luncher{
     public static void main(String [] args){
@@ -14,7 +16,7 @@ public class Luncher{
         AtomicInteger totalNumber = new AtomicInteger(0);
         final List<String> numberLetter = new ArrayList<String>();
         numberLetter.add("one");
-        numberLetter.add("tow");
+        numberLetter.add("two");
         numberLetter.add("three");
         numberLetter.add("four");
         numberLetter.add("five");
@@ -26,26 +28,33 @@ public class Luncher{
         try (Stream<String> stream = Files.lines(path)){
             stream.forEach(element ->{
                     String value = "";
+                    int indexMot =0;
+                    Map<Integer, Integer> dict= new HashMap<>();
+                    //index -- Value
 
-                    // on regarde s'il y a les nombre en lettre
-
-                   numberLetter.contains(element)
-
+                    for(int i=0; i< numberLetter.size(); i++){
+                        int index = element.indexOf(numberLetter.get(i));
+                        while(index != -1){
+                            dict.put(index, i+1);
+                            index = element.indexOf(numberLetter.get(i),index+1);
+                        }
+                    }
                     // On regarde les chiffre
                     for(int i=0; i < element.length(); i++) {
-                        
-                        
-
                         if(Character.isDigit(element.charAt(i))){
-                            value += element.charAt(i);
+                            dict.put(i, Integer.parseInt(String.valueOf(element.charAt(i))));
                         }
                         
                     }
+                    System.out.println("Le mot : "+element);
+                    System.err.println(dict);
                     
-                    String resultValue = String.valueOf(value.charAt(0));
-                    resultValue += String.valueOf(value.charAt(value.length()-1));
-                    System.out.println(resultValue);
-                    totalNumber.addAndGet(Integer.parseInt(resultValue));
+                    
+                     String resultValue = String.valueOf(dict.get(Collections.min(dict.keySet())));
+                     resultValue += String.valueOf(dict.get(Collections.max(dict.keySet())));
+                     System.out.println(resultValue);
+                    
+                     totalNumber.addAndGet(Integer.parseInt(resultValue));
                 }
              );
 
